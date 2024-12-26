@@ -28,11 +28,18 @@ namespace ChoreManager.Api.Controllers
             return Ok(chore);
         }
         
-        [HttpDelete]
-        public async Task<IActionResult> DeleteChore([FromBody] Chore chore)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteChore([FromRoute] Guid id)
         {
-            await _deleteChore.ExecuteAsync(chore);
-            return Ok(chore);
+            try
+            {
+                await _deleteChore.ExecuteAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while deleting chore.", Details = ex.Message });
+            }
         }
 
         [HttpGet]

@@ -37,10 +37,29 @@ namespace ChoreManager.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Chore chore)
+        public async Task DeleteAsync(Guid choreId)
         {
-            _dbContext.Chores.Remove(chore);
-            await _dbContext.SaveChangesAsync();
+            try
+            {
+                var choreToDelete = await _dbContext.Chores.FirstOrDefaultAsync(c => c.Id == choreId);
+
+                if (choreToDelete == null)
+                {
+                    throw new ArgumentException($"No se encontró ninguna tarea con el ID {choreId}");
+                }
+
+                _dbContext.Chores.Remove(choreToDelete);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new InvalidOperationException("Error al intentar eliminar la tarea", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Ocurrió un error inesperado al eliminar la tarea", ex);
+            }
         }
 
         public async Task<List<Chore>> GetAllAsync()
@@ -50,9 +69,9 @@ namespace ChoreManager.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Chore?> GetByIdAsync(Guid id)
+        public async Task<Chore?> GetByIdAsync(Guid choreId)
         {
-            return await _dbContext.Chores.FirstOrDefaultAsync(chore => chore.Id == id);
+            return await _dbContext.Chores.FirstOrDefaultAsync(chore => chore.Id == choreId);
         }
 
         #endregion

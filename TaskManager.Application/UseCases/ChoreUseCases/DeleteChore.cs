@@ -11,9 +11,12 @@ namespace ChoreManager.Application.UseCases.ChoreUseCases
             _choreRepository = choreRepository;
         }
 
-        public async Task ExecuteAsync(Chore chore)
+        public async Task ExecuteAsync(Guid id)
         {
-            await _choreRepository.DeleteAsync(chore);
+            if (id == Guid.Empty)
+                throw new ArgumentException("El ID de la tarea no puede ser Guid.Empty.");
+
+            await _choreRepository.DeleteAsync(id);
         }
     }
 }
