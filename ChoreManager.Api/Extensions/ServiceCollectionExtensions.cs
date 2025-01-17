@@ -1,4 +1,5 @@
-﻿using ChoreManager.Application.UseCases.ChoreUseCases;
+﻿using ChoreManager.Application.UseCases.ChoreUseCases.Implementations;
+using ChoreManager.Application.UseCases.ChoreUseCases.Interfaces;
 using ChoreManager.Domain.Interfaces;
 using ChoreManager.Infrastructure.Context;
 using ChoreManager.Infrastructure.Repositories;
@@ -20,10 +21,11 @@ namespace ChoreManager.Api.Extensions
 
         public static IServiceCollection AddApplicationServices (this IServiceCollection services)
         {
-            services.AddScoped<CreateChoreUseCase>();
-            services.AddScoped<DeleteChoreUseCase>();
-            services.AddScoped<SelectAllChoresUseCase>();
-            services.AddScoped<SelectChoreByIdUseCase>();
+            services.AddScoped<ICreateChoreUseCase, CreateChoreUseCase>();
+            services.AddScoped<IDeleteChoreUseCase, DeleteChoreUseCase>();
+            services.AddScoped<ISelectAllChoresUseCase, SelectAllChoresUseCase>();
+            services.AddScoped<ISelectChoreByIdUseCase, SelectChoreByIdUseCase>();
+            services.AddScoped<IUpdateChoreUseCase, UpdateChoreUseCase>();
 
             return services;
         }
