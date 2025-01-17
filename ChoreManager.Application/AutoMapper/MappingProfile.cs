@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using ChoreManager.Application.DTOs;
 using ChoreManager.Domain.Entities;
-using System.Xml.Serialization;
-using static ChoreManager.Domain.Enums.ChoreEnums;
 
 namespace ChoreManager.Application.AutoMapper
 {
@@ -11,6 +9,7 @@ namespace ChoreManager.Application.AutoMapper
         public MappingProfile()
         {
             CreateMap<Chore, ChoreDto>();
+            CreateMap<ChoreDto, Chore>();
             CreateMap<CreateChoreDto, Chore>();
         }
     }

@@ -6,7 +6,8 @@ namespace ChoreManager.Domain.Interfaces
     {
         Task AddAsync(Chore chore);
         Task DeleteAsync(Guid id);
+        Task UpdateAsync(Chore chore);
         Task<Chore?> GetByIdAsync(Guid id);
-        Task<List<Chore>> GetAllAsync();
+        Task<IEnumerable<Chore>> GetAllAsync();
     }
 }

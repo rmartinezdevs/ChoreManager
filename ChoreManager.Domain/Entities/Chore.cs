@@ -11,9 +11,9 @@ namespace ChoreManager.Domain.Entities
         public ChoreStatus Status { get; set; }
         public Guid AssignedUserId { get; set; }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+#pragma warning disable CS8618
         public Chore() { }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+#pragma warning restore CS8618 
 
         public Chore(Guid id, string title, string description, DateTime dueDate, ChoreStatus status, Guid assignedUserId)
         {
