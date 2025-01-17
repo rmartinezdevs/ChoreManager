@@ -1,9 +1,9 @@
-﻿using ChoreManager.Domain.Entities;
+﻿using ChoreManager.Application.UseCases.ChoreUseCases.Interfaces;
 using ChoreManager.Domain.Interfaces;
 
-namespace ChoreManager.Application.UseCases.ChoreUseCases
+namespace ChoreManager.Application.UseCases.ChoreUseCases.Implementations
 {
-    public class DeleteChoreUseCase
+    public class DeleteChoreUseCase : IDeleteChoreUseCase
     {
         private readonly IChoreRepository _choreRepository;
         public DeleteChoreUseCase(IChoreRepository choreRepository)

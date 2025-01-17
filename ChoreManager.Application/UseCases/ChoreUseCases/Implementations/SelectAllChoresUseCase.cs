@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using ChoreManager.Application.DTOs;
+using ChoreManager.Application.UseCases.ChoreUseCases.Interfaces;
 using ChoreManager.Domain.Interfaces;
 
-namespace ChoreManager.Application.UseCases.ChoreUseCases
+namespace ChoreManager.Application.UseCases.ChoreUseCases.Implementations
 {
-    public class SelectAllChoresUseCase
+    public class SelectAllChoresUseCase : ISelectAllChoresUseCase
     {
         private readonly IChoreRepository _choreRepository;
         private readonly IMapper _mapper;

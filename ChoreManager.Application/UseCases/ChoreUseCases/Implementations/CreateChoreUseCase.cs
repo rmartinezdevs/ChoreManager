@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using ChoreManager.Application.DTOs;
+using ChoreManager.Application.UseCases.ChoreUseCases.Interfaces;
 using ChoreManager.Domain.Entities;
 using ChoreManager.Domain.Interfaces;
 using FluentValidation;
 
-namespace ChoreManager.Application.UseCases.ChoreUseCases
+namespace ChoreManager.Application.UseCases.ChoreUseCases.Implementations
 {
-    public class CreateChoreUseCase
+    public class CreateChoreUseCase : ICreateChoreUseCase
     {
         private readonly IChoreRepository _choreRepository;
         private readonly IValidator<CreateChoreDto> _validator;

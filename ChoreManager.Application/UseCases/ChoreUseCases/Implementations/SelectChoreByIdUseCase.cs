@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using ChoreManager.Application.DTOs;
+using ChoreManager.Application.UseCases.ChoreUseCases.Interfaces;
 using ChoreManager.Domain.Interfaces;
 
-namespace ChoreManager.Application.UseCases.ChoreUseCases
+namespace ChoreManager.Application.UseCases.ChoreUseCases.Implementations
 {
-    public class SelectChoreByIdUseCase
+    public class SelectChoreByIdUseCase : ISelectChoreByIdUseCase
     {
         private readonly IChoreRepository _choreRepository;
         private readonly IMapper _mapper;
@@ -16,7 +17,7 @@ namespace ChoreManager.Application.UseCases.ChoreUseCases
             _mapper = mapper;
         }
 
-        public async Task<ChoreDto?> ExecuteAsync(Guid choreId)
+        public async Task<ChoreDto> ExecuteAsync(Guid choreId)
         {
             if (choreId == Guid.Empty)
                 throw new ArgumentException("El ID de la tarea no puede ser Guid.Empty.");
