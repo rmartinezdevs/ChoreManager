@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using ChoreManager.Api.Common;
+using FluentValidation;
+using System.Net;
 using System.Text.Json;
 
 namespace ChoreManager.Api.Middleware
@@ -20,53 +22,46 @@ namespace ChoreManager.Api.Middleware
             {
                 await _next(context);
             }
-            catch (FluentValidation.ValidationException validationEx)
+            catch (ValidationException validationEx)
             {
-                _logger.LogError(validationEx, "Error en la validacion de los campos en chore");
-                await HandleValidationException(context, validationEx);
+                _logger.LogWarning(validationEx, "Validation error occurred.");
+                await HandleExceptionAsync(context, validationEx, HttpStatusCode.BadRequest);
             }
-            catch (Exception generalEx)
+            catch (ArgumentException argEx)
             {
-                _logger.LogError(generalEx, "Error inesperado");
-                await HandleExceptionAsync(context, generalEx);
+                _logger.LogWarning(argEx, "Argument exception occurred.");
+                await HandleExceptionAsync(context, argEx, HttpStatusCode.BadRequest);
+            }
+            catch (InvalidOperationException opEx)
+            {
+                _logger.LogWarning(opEx, "Invalid operation exception occurred.");
+                await HandleExceptionAsync(context, opEx, HttpStatusCode.Conflict);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                await HandleExceptionAsync(context, ex, HttpStatusCode.InternalServerError);
             }
         }
 
-        private async Task HandleValidationException(HttpContext context, FluentValidation.ValidationException ex)
+        private async Task HandleExceptionAsync(HttpContext context, Exception ex, HttpStatusCode statusCode)
         {
-            context.Response.ContentType = "application/json";
-
-            context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
-
-            var errors = ex.Errors.Select(e => new
+            var response = new ErrorResponse
             {
-                Field = e.PropertyName,
-                Error = e.ErrorMessage
-            });
-
-            var response = new
-            {
-                StatusCode = context.Response.StatusCode,
-                Message = "Error de validación",
-                Details = errors
+                StatusCode = (int) statusCode,
+                Message = ex.Message,
+                Details = ex.InnerException?.Message
             };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            await WriteResponseAsync(context, response, statusCode);
         }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        private async Task WriteResponseAsync(HttpContext context, ErrorResponse response, HttpStatusCode statusCode)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)statusCode;
 
-            var response = new
-            {
-                StatusCode = context.Response.StatusCode,
-                Message = "Error inesperado",
-                Details = ex.Message
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
         }
     }
 }
