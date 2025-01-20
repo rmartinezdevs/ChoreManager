@@ -17,7 +17,7 @@ namespace ChoreManager.Infrastructure.Repositories
 
         #region Constructor
 
-        public ChoreRepository (AppDbContext dbContext, IMapper mapper)
+        public ChoreRepository(AppDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
@@ -31,7 +31,8 @@ namespace ChoreManager.Infrastructure.Repositories
         {
             var existChore = await FindChoreByIdAsync(chore.Id);
 
-            if (existChore != null) {
+            if (existChore != null)
+            {
                 throw new InvalidOperationException($"A chore with ID {chore.Id} already exists.");
             }
 
@@ -57,10 +58,6 @@ namespace ChoreManager.Infrastructure.Repositories
             {
                 throw new InvalidOperationException("Error al intentar eliminar la tarea", ex);
             }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Ocurrió un error inesperado al eliminar la tarea", ex);
-            }
         }
 
         public async Task UpdateAsync(Chore chore)
@@ -84,10 +81,6 @@ namespace ChoreManager.Infrastructure.Repositories
             {
                 throw new InvalidOperationException("Error al intentar actualizar la tarea", ex);
             }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Ocurrió un error inesperado al actualizar la tarea", ex);
-            }
         }
 
         public async Task<IEnumerable<Chore>> GetAllAsync()
@@ -97,7 +90,13 @@ namespace ChoreManager.Infrastructure.Repositories
 
         public async Task<Chore?> GetByIdAsync(Guid choreId)
         {
-            return await FindChoreByIdAsync(choreId);
+            var chore = await FindChoreByIdAsync(choreId);
+
+            if (chore == null)
+            {
+                throw new ArgumentException($"No se encontró ninguna tarea con el ID {choreId}");
+            }
+            return chore;
         }
 
         #endregion

@@ -10,6 +10,7 @@ namespace ChoreManager.Application.AutoMapper
         {
             CreateMap<Chore, ChoreDto>();
             CreateMap<ChoreDto, Chore>();
+            CreateMap<Chore, Chore>();
             CreateMap<CreateChoreDto, Chore>();
         }
     }
