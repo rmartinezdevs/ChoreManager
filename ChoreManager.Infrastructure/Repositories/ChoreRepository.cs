@@ -26,14 +26,13 @@ namespace ChoreManager.Infrastructure.Repositories
 
         public async Task AddAsync(Chore chore)
         {
-            var existChore = await _dbContext.Chores.FirstOrDefaultAsync(c => c.Id == chore.Id);
+            var existChore = await FindChoreByIdAsync(chore.Id);
 
-            if(existChore != null) {
-                return;
+            if (existChore != null) {
+                throw new InvalidOperationException($"A chore with ID {chore.Id} already exists.");
             }
 
             _dbContext.Chores.Add(chore);
-
             await _dbContext.SaveChangesAsync();
         }
 
@@ -41,7 +40,7 @@ namespace ChoreManager.Infrastructure.Repositories
         {
             try
             {
-                var choreToDelete = await _dbContext.Chores.FirstOrDefaultAsync(c => c.Id == choreId);
+                var choreToDelete = await FindChoreByIdAsync(choreId);
 
                 if (choreToDelete == null)
                 {
@@ -49,7 +48,6 @@ namespace ChoreManager.Infrastructure.Repositories
                 }
 
                 _dbContext.Chores.Remove(choreToDelete);
-
                 await _dbContext.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
@@ -66,7 +64,7 @@ namespace ChoreManager.Infrastructure.Repositories
         {
             try
             {
-                var choreToUpdate = await _dbContext.Chores.FirstOrDefaultAsync(c => c.Id == chore.Id);
+                var choreToUpdate = await FindChoreByIdAsync(chore.Id);
 
                 if (choreToUpdate == null)
                 {
@@ -85,11 +83,11 @@ namespace ChoreManager.Infrastructure.Repositories
             }
             catch (DbUpdateException ex)
             {
-                throw new InvalidOperationException("Error al intentar eliminar la tarea", ex);
+                throw new InvalidOperationException("Error al intentar actualizar la tarea", ex);
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("Ocurrió un error inesperado al eliminar la tarea", ex);
+                throw new InvalidOperationException("Ocurrió un error inesperado al actualizar la tarea", ex);
             }
         }
 
@@ -102,7 +100,16 @@ namespace ChoreManager.Infrastructure.Repositories
 
         public async Task<Chore?> GetByIdAsync(Guid choreId)
         {
-            return await _dbContext.Chores.FirstOrDefaultAsync(chore => chore.Id == choreId);
+            return await FindChoreByIdAsync(choreId);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private async Task<Chore?> FindChoreByIdAsync(Guid id)
+        {
+            return await _dbContext.Chores.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         #endregion

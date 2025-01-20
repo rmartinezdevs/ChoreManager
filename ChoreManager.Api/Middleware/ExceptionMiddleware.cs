@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 
 namespace ChoreManager.Api.Middleware
