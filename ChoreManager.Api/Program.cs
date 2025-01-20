@@ -1,10 +1,7 @@
 using ChoreManager.Api.Extensions;
 using ChoreManager.Api.Middleware;
 using ChoreManager.Application.AutoMapper;
-using ChoreManager.Application.Validators;
 using ChoreManager.Infrastructure.Context;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GestorTareas.Api
@@ -14,9 +11,6 @@ namespace GestorTareas.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddFluentValidationAutoValidation();
-            builder.Services.AddValidatorsFromAssemblyContaining<ChoreValidator>();
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
