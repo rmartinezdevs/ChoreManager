@@ -1,4 +1,5 @@
-﻿using ChoreManager.Domain.Entities;
+﻿using AutoMapper;
+using ChoreManager.Domain.Entities;
 using ChoreManager.Domain.Interfaces;
 using ChoreManager.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -10,14 +11,16 @@ namespace ChoreManager.Infrastructure.Repositories
         #region Variables
 
         private readonly AppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         #endregion
 
         #region Constructor
 
-        public ChoreRepository (AppDbContext dbContext)
+        public ChoreRepository (AppDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         #endregion
@@ -71,11 +74,7 @@ namespace ChoreManager.Infrastructure.Repositories
                     throw new ArgumentException($"No se encontró ninguna tarea con el ID {chore.Id}");
                 }
 
-                choreToUpdate.Title = chore.Title;
-                choreToUpdate.Description = chore.Description;
-                choreToUpdate.DueDate = chore.DueDate;
-                choreToUpdate.Status = chore.Status;
-                choreToUpdate.AssignedUserId = chore.AssignedUserId;
+                _mapper.Map(chore, choreToUpdate);
 
                 _dbContext.Chores.Update(choreToUpdate);
 
@@ -93,9 +92,7 @@ namespace ChoreManager.Infrastructure.Repositories
 
         public async Task<IEnumerable<Chore>> GetAllAsync()
         {
-            return await _dbContext.Chores
-                .Select(c => new Chore(c.Id, c.Title, c.Description, c.DueDate, c.Status, c.AssignedUserId))
-                .ToListAsync();
+            return await _dbContext.Chores.ToListAsync();
         }
 
         public async Task<Chore?> GetByIdAsync(Guid choreId)
