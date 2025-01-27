@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using ChoreManager.Domain.Entities;
+﻿using ChoreManager.Domain.Entities;
 using ChoreManager.Infrastructure.Context;
 using ChoreManager.Infrastructure.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace ChoreManager.Tests.Repositories
 {
