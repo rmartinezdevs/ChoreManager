@@ -56,7 +56,7 @@ namespace ChoreManager.Tests.UseCases
             SelectChoreByIdUseCase useCase = new (_repositoryMock.Object, _mapper);
 
             //Act
-            Func<Task> act = async () => useCase.ExecuteAsync(invalidId);
+            Func<Task> act = async () => await useCase.ExecuteAsync(invalidId);
 
             //Assert
             await act.Should().ThrowAsync<ArgumentException>()
@@ -73,7 +73,7 @@ namespace ChoreManager.Tests.UseCases
             SelectChoreByIdUseCase useCase = new (_repositoryMock.Object, _mapper);
 
             _repositoryMock.Setup(repo => repo.GetByIdAsync(nonExistentId))
-                .ReturnsAsync((Chore)null);
+                .ReturnsAsync(default(Chore));
 
             //Act
             var result = await useCase.ExecuteAsync(nonExistentId);

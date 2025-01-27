@@ -16,7 +16,7 @@ namespace ChoreManager.Tests.UseCases
         private readonly Mock<IValidator<ChoreDto>> _validatorMock;
         private readonly IMapper _mapper;
 
-        public UpdateChoreUseCaseTests(Mock<IChoreRepository> repositoryMock, Mock<IValidator<ChoreDto>> validatorMock, IMapper mapper)
+        public UpdateChoreUseCaseTests()
         {
             _repositoryMock = new Mock<IChoreRepository>();
             _validatorMock = new Mock<IValidator<ChoreDto>>();
@@ -88,6 +88,9 @@ namespace ChoreManager.Tests.UseCases
                 AssignedUserId = Guid.NewGuid()
             };
 
+            _repositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(default(Chore));
+
             //Act
             Func<Task> act = async () => await useCase.ExecuteAsync(invalidChoreDto);
 
@@ -114,16 +117,15 @@ namespace ChoreManager.Tests.UseCases
             };
 
             _repositoryMock.Setup(repo => repo.GetByIdAsync(nonExistentId))
-                .ReturnsAsync((Chore)null);
+                .ReturnsAsync(default(Chore));
 
             var useCase = new UpdateChoreUseCase(_repositoryMock.Object, _validatorMock.Object, _mapper);
-
 
             //Act
             Func<Task> act = async () => await useCase.ExecuteAsync(choreDto);
 
             //Asserts
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowAsync<KeyNotFoundException>()
                 .WithMessage($"No se encontró ninguna tarea con el ID {nonExistentId}.");
         }
 
@@ -132,9 +134,21 @@ namespace ChoreManager.Tests.UseCases
         {
             //Arrange
             UpdateChoreUseCase useCase = new (_repositoryMock.Object, _validatorMock.Object, _mapper);
+            var validId = Guid.NewGuid();
+
+            var existingChore = new Chore
+            {
+                Id = validId,
+                Title = "Old Title",
+                Description = "Old Description",
+                DueDate = DateTime.Now.AddDays(1),
+                Status = Domain.Enums.ChoreEnums.ChoreStatus.Pending,
+                AssignedUserId = Guid.NewGuid()
+            };
+
             var choreDto = new ChoreDto
             {
-                Id = Guid.NewGuid(),
+                Id = validId,
                 Title = "Invalid Chore",
                 Description = "Invalid Chore",
                 DueDate = DateTime.Now.AddDays(-1),
@@ -147,6 +161,9 @@ namespace ChoreManager.Tests.UseCases
                 new ValidationFailure("DueDate", "La fecha de vencimiento no puede ser en el pasado")
             };
 
+            _repositoryMock.Setup(repo => repo.GetByIdAsync(validId))
+                 .ReturnsAsync(existingChore);
+
             _validatorMock.Setup(validator => validator.ValidateAsync(choreDto, default))
                 .ReturnsAsync(new ValidationResult(validationFailures));
 
@@ -154,8 +171,9 @@ namespace ChoreManager.Tests.UseCases
             Func<Task> act = async() => await useCase.ExecuteAsync(choreDto);
 
             //Asserts
-            await act.Should().ThrowAsync<ValidationException>()
-                .WithMessage("Validation Exception");
+            var exception = await act.Should().ThrowAsync<FluentValidation.ValidationException>();
+            exception.Which.Errors.Should().ContainSingle(e =>
+                e.PropertyName == "DueDate" && e.ErrorMessage == "La fecha de vencimiento no puede ser en el pasado");
 
             _repositoryMock.Verify(repo => repo.UpdateAsync(It.IsAny<Chore>()), Times.Never);
         }

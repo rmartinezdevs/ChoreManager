@@ -78,7 +78,9 @@ namespace ChoreManager.Tests.UseCases
             Func<Task> act = async () => await useCase.ExecuteAsync(createChoreDto);
 
             //Assert
-            await act.Should().ThrowAsync<ValidationException>().WithMessage("Validation failed");
+            var exception = await act.Should().ThrowAsync<FluentValidation.ValidationException>();
+            exception.Which.Errors.Should().ContainSingle(e =>
+                e.PropertyName == "Title" && e.ErrorMessage == "Titulo de la tarea obligatorio");
         }
 
         [Fact]
@@ -102,9 +104,13 @@ namespace ChoreManager.Tests.UseCases
                 .ReturnsAsync(new ValidationResult(validationFailures));
 
             // Act
-            await useCase.ExecuteAsync(createChoreDto);
+            Func<Task> act = async () => await useCase.ExecuteAsync(createChoreDto);
 
             //Assert
+            var exception = await act.Should().ThrowAsync<FluentValidation.ValidationException>();
+            exception.Which.Errors.Should().ContainSingle(e =>
+                e.PropertyName == "Title" && e.ErrorMessage == "Titulo de la tarea obligatorio");
+
             _repositoryMock.Verify(repo => repo.AddAsync(It.IsAny<Chore>()), Times.Never());
         }
     }
