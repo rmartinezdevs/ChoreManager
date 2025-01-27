@@ -20,16 +20,6 @@ namespace ChoreManager.Application.UseCases.ChoreUseCases.Implementations
         {
             var chores = await _choreRepository.GetAllAsync();
             return _mapper.Map<List<ChoreDto>>(chores);
-
-            //return chores.Select(chore => new ChoreDTO
-            //{
-            //    Id = chore.Id,
-            //    Title = chore.Title,
-            //    Description = chore.Description,
-            //    DueDate = chore.DueDate,
-            //    Status = chore.Status,
-            //    AssignedUserId = chore.AssignedUserId
-            //}).ToList();
         }
     }
 }
