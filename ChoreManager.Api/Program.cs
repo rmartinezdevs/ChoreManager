@@ -22,6 +22,21 @@ namespace GestorTareas.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddCors(options =>
+            {
+                var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+                if (allowedOrigins is not null)
+                {
+
+                    options.AddPolicy("AllowSpecificOrigins", policy =>
+                    {
+                        policy.WithOrigins(allowedOrigins)
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                    });
+                }
+            });
+
             var app = builder.Build();
 
             app.UseMiddleware<ExceptionMiddleware>();
@@ -29,20 +44,20 @@ namespace GestorTareas.Api
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                dbContext.Database.Migrate(); 
+                dbContext.Database.Migrate();
             }
-            
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-                    options.RoutePrefix = string.Empty; 
+                    options.RoutePrefix = string.Empty;
                 });
             }
 
-            // Configure the HTTP request pipeline.
+            app.UseCors("AllowSpecificOrigins");
 
             app.UseHttpsRedirection();
 
